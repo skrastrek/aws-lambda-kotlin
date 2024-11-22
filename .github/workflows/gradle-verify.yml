@@ -37,7 +37,3 @@ jobs:
       - name: Gradle test
         id: gradle-test
         run: ./gradlew test
-
-      - name: Gradle build
-        id: gradle-build
-        run: ./gradlew build

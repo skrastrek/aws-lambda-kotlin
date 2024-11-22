@@ -42,10 +42,6 @@ jobs:
         with:
           cache-encryption-key: ${{ secrets.gradle-encryption-key }}
 
-      - name: Gradle build
-        id: gradle-build
-        run: ./gradlew build
-
       - name: Gradle publish
         id: gradle-publish
         run: ./gradlew -Pversion=${{ inputs.version }} publish
