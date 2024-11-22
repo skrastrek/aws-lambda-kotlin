@@ -37,8 +37,6 @@ subprojects {
         publications.register<MavenPublication>("maven") {
             artifactId = project.name
             from(components["kotlin"])
-            artifact(tasks["sourcesJar"])
-            artifact(tasks["javadocJar"])
             pom {
                 name = "AWS Lambda Kotlin"
                 description = "Utility for Kotlin development with AWS Lambda."
