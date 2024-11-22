@@ -1,0 +1,56 @@
+name: Gradle build
+
+on:
+  workflow_call:
+    inputs:
+      version:
+        required: true
+        type: string
+    secrets:
+      gradle-encryption-key:
+        required: true
+      gpg-signing-key:
+        required: true
+      gpg-signing-passphrase:
+        required: true
+      ossrh_username:
+        required: true
+      ossrh_password:
+        required: true
+
+jobs:
+  publish:
+    name: Publish
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Check out code
+        id: checkout
+        uses: actions/checkout@v4
+
+      - name: Java setup
+        id: java-setup
+        uses: actions/setup-java@v4
+        with:
+          distribution: ${{ vars.JAVA_DISTRIBUTION }}
+          java-version: ${{ vars.JAVA_VERSION }}
+
+      - name: Gradle setup
+        id: gradle-setup
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          cache-encryption-key: ${{ secrets.gradle-encryption-key }}
+
+      - name: Gradle build
+        id: gradle-build
+        run: ./gradlew build
+
+      - name: Gradle publish
+        id: gradle-publish
+        run: ./gradlew -Pversion=${{ inputs.version }} publish
+        env:
+          GPG_SIGNING_KEY: ${{ secrets.gpg-signing-key }}
+          GPG_SIGNING_PASSPHRASE: ${{ secrets.gpg-signing-passphrase }}
+          OSSRH_USERNAME: ${{ secrets.ossrh_username }}
+          OSSRH_PASSWORD: ${{ secrets.ossrh_password }}
