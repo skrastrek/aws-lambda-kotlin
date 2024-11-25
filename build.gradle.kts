@@ -5,7 +5,7 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 import org.jlleitschuh.gradle.ktlint.KtlintExtension
 
 allprojects {
-    group = "io.skrastrek.aws.lambda.kotlin"
+    group = "io.skrastrek"
     repositories {
         mavenCentral()
     }
@@ -35,10 +35,10 @@ subprojects {
 
     configure<PublishingExtension> {
         publications.register<MavenPublication>("maven") {
-            artifactId = project.name
+            artifactId = "aws-lambda-kotlin-${project.name}"
             from(components["kotlin"])
             pom {
-                name = "AWS Lambda Kotlin"
+                name = "aws-lambda-kotlin"
                 description = "Utility for Kotlin development with AWS Lambda."
                 url = "https://github.com/skrastrek/aws-lambda-kotlin"
                 packaging = "jar"
@@ -69,12 +69,17 @@ subprojects {
 
         repositories {
             maven {
-                val releaseRepo = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
-                val snapshotRepo = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
+                name = "GitHubPackages"
+                url = uri("https://maven.pkg.github.com/skrastrek/aws-lambda-kotlin")
+                credentials {
+                    username = System.getenv("GITHUB_ACTOR")
+                    password = System.getenv("GITHUB_TOKEN")
+                }
+            }
 
+            maven {
                 name = "OSSRH"
-                url = uri(if (version.toString().endsWith("SNAPSHOT")) snapshotRepo else releaseRepo)
-
+                url = uri("https://oss.sonatype.org/service/local/staging/deploy/maven2/")
                 credentials {
                     username = System.getenv("OSSRH_USERNAME")
                     password = System.getenv("OSSRH_PASSWORD")
