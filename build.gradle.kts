@@ -1,3 +1,5 @@
+import com.vanniktech.maven.publish.MavenPublishBaseExtension
+import com.vanniktech.maven.publish.SonatypeHost
 import org.gradle.api.tasks.testing.logging.TestLogEvent.FAILED
 import org.gradle.api.tasks.testing.logging.TestLogEvent.PASSED
 import org.gradle.api.tasks.testing.logging.TestLogEvent.SKIPPED
@@ -14,66 +16,46 @@ allprojects {
 plugins {
     alias(libs.plugins.kotlin.jvm).apply(false)
     alias(libs.plugins.ktlint).apply(false)
+    alias(libs.plugins.maven.publish).apply(false)
 }
 
 subprojects {
     apply(plugin = "org.jetbrains.kotlin.jvm")
     apply(plugin = "org.jlleitschuh.gradle.ktlint")
-    apply(plugin = "maven-publish")
-    apply(plugin = "signing")
+    apply(plugin = "com.vanniktech.maven.publish")
 
-    configure<SigningExtension> {
-        val signingKey = providers.environmentVariable("GPG_SIGNING_KEY")
-        val signingPassphrase = providers.environmentVariable("GPG_SIGNING_PASSPHRASE")
+    configure<MavenPublishBaseExtension> {
+        publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
+        signAllPublications()
 
-        if (signingKey.isPresent && signingPassphrase.isPresent) {
-            useInMemoryPgpKeys(signingKey.get(), signingPassphrase.get())
-            val extension = extensions.getByName("publishing") as PublishingExtension
-            sign(extension.publications)
-        }
-    }
+        coordinates("io.skrastrek", "aws-lambda-kotlin-${project.name}", project.version.toString())
 
-    configure<PublishingExtension> {
-        publications.register<MavenPublication>("maven") {
-            artifactId = "aws-lambda-kotlin-${project.name}"
-            from(components["kotlin"])
-            pom {
-                name = "aws-lambda-kotlin"
-                description = "Utility for Kotlin development with AWS Lambda."
+        pom {
+            name = "aws-lambda-kotlin"
+            description = "Utility for Kotlin development with AWS Lambda."
+            url = "https://github.com/skrastrek/aws-lambda-kotlin"
+            inceptionYear = "2024"
+            packaging = "jar"
+
+            scm {
                 url = "https://github.com/skrastrek/aws-lambda-kotlin"
-                packaging = "jar"
+                connection = "scm:git://github.com:skrastrek/aws-lambda-kotlin.git"
+                developerConnection = "scm:git://github.com:skrastrek/aws-lambda-kotlin.git"
+            }
 
-                scm {
-                    url = "https://github.com/skrastrek/aws-lambda-kotlin"
-                    connection = "scm:git://github.com:skrastrek/aws-lambda-kotlin.git"
-                    developerConnection = "scm:git://github.com:skrastrek/aws-lambda-kotlin.git"
-                }
-
-                licenses {
-                    license {
-                        name = "Apache-2.0"
-                        url = "https://opensource.org/licenses/Apache-2.0"
-                    }
-                }
-
-                developers {
-                    developer {
-                        id = "sebramsland"
-                        name = "Sebastian Ramsland"
-                        email = "sebastian@skrastrek.io"
-                        organizationUrl = "https://skrastrek.io"
-                    }
+            licenses {
+                license {
+                    name = "Apache-2.0"
+                    url = "https://opensource.org/licenses/Apache-2.0"
                 }
             }
-        }
 
-        repositories {
-            maven {
-                name = "GitHubPackages"
-                url = uri("https://maven.pkg.github.com/skrastrek/aws-lambda-kotlin")
-                credentials {
-                    username = System.getenv("GITHUB_ACTOR")
-                    password = System.getenv("GITHUB_TOKEN")
+            developers {
+                developer {
+                    id = "sebramsland"
+                    name = "Sebastian Ramsland"
+                    email = "sebastian@skrastrek.io"
+                    organizationUrl = "https://skrastrek.io"
                 }
             }
         }
