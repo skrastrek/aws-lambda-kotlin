@@ -7,13 +7,13 @@ on:
         required: true
         type: string
     secrets:
-      gradle-encryption-key:
+      gpg-signing-key:
         required: true
       gpg-signing-key-id:
         required: true
-      gpg-signing-key:
+      gpg-signing-key-password:
         required: true
-      gpg-signing-password:
+      gradle-encryption-key:
         required: true
       maven-central-username:
         required: true

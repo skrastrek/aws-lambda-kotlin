@@ -14,10 +14,10 @@ jobs:
     name: Gradle publish
     uses: ./.github/workflows/gradle-publish.yml
     secrets:
-      gradle-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
       gpg-signing-key: ${{ secrets.GPG_SIGNING_KEY }}
       gpg-signing-key-id: ${{ secrets.GPG_SIGNING_KEY_ID }}
-      gpg-signing-password: ${{ secrets.GPG_SIGNING_PASSWORD }}
+      gpg-signing-key-password: ${{ secrets.GPG_SIGNING_KEY_PASSWORD }}
+      gradle-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
       maven-central-username: ${{ secrets.MAVEN_CENTRAL_USERNAME }}
       maven-central-password: ${{ secrets.MAVEN_CENTRAL_PASSWORD }}
     with:
