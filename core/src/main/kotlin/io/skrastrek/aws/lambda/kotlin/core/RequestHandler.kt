@@ -32,18 +32,18 @@ interface RequestHandler<I : Any, O : Any> : RequestStreamHandler {
         input: InputStream,
         output: OutputStream,
         context: Context,
-    ) {
-        val request: I = readInput(input)
-        val response: O = handleRequest(request, context)
-        writeOutput(response, output)
-    }
+    ) = handleRequest(input.jsonDecode(), context).jsonEncodeTo(output)
 
     @OptIn(ExperimentalSerializationApi::class)
-    private fun readInput(input: InputStream): I = json.decodeFromStream(deserializer, input)
+    private fun InputStream.jsonDecode(): I = json.decodeFromStream(deserializer, this)
 
     @OptIn(ExperimentalSerializationApi::class)
-    private fun writeOutput(
-        result: O,
-        output: OutputStream,
-    ) = json.encodeToStream(serializer, result, output)
+    private fun O.jsonEncodeTo(output: OutputStream) = json.encodeToStream(serializer, this, output)
 }
+
+fun <I : Any, O : Any> RequestHandler<I, O>.handleRequest(input: I): O = handleRequest(input, EmptyContext)
+
+fun <I : Any, O : Any> RequestHandler<I, O>.handleRequest(
+    input: InputStream,
+    output: OutputStream,
+) = handleRequest(input, output, EmptyContext)
