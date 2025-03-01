@@ -9,7 +9,7 @@ maven-publish = "0.30.0"
 # Libs
 aws-lambda-java-core = "1.2.3"
 
-kotlinx-datetime = "0.6.1"
+kotlinx-datetime = "0.6.2"
 kotlinx-serialization = "1.8.0"
 
 [plugins]
