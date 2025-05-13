@@ -71,6 +71,8 @@ data class AttributeValue(
     val n: String? = null,
     @SerialName("B")
     val b: ByteArray? = null,
+    @SerialName("BOOL")
+    val bool: Boolean? = null,
     @SerialName("SS")
     val ss: List<String>? = null,
     @SerialName("NS")
@@ -90,6 +92,7 @@ data class AttributeValue(
 
         other as AttributeValue
 
+        if (bool != other.bool) return false
         if (nullValue != other.nullValue) return false
         if (s != other.s) return false
         if (n != other.n) return false
@@ -104,7 +107,8 @@ data class AttributeValue(
     }
 
     override fun hashCode(): Int {
-        var result = nullValue?.hashCode() ?: 0
+        var result = bool?.hashCode() ?: 0
+        result = 31 * result + (nullValue?.hashCode() ?: 0)
         result = 31 * result + (s?.hashCode() ?: 0)
         result = 31 * result + (n?.hashCode() ?: 0)
         result = 31 * result + (b?.contentHashCode() ?: 0)
@@ -115,6 +119,7 @@ data class AttributeValue(
         result = 31 * result + (l?.hashCode() ?: 0)
         return result
     }
+
 }
 
 @Serializable
