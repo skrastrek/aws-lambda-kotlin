@@ -119,7 +119,6 @@ data class AttributeValue(
         result = 31 * result + (l?.hashCode() ?: 0)
         return result
     }
-
 }
 
 @Serializable
