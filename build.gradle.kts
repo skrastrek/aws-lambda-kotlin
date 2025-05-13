@@ -83,7 +83,7 @@ subprojects {
     }
 
     extensions.configure<KtlintExtension> {
-        version = "1.4.1"
+        version = "1.5.0"
         outputToConsole = true
         verbose = true
     }
