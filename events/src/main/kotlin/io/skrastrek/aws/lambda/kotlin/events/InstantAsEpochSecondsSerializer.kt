@@ -13,14 +13,14 @@ typealias InstantAsEpochSeconds =
     Instant
 
 object InstantAsEpochSecondsSerializer : KSerializer<Instant> {
-    override val descriptor = PrimitiveSerialDescriptor("io.skrastrek.aws.lambda.kotlin.events.InstantAsEpochSeconds", PrimitiveKind.LONG)
+    override val descriptor = PrimitiveSerialDescriptor("io.skrastrek.aws.lambda.kotlin.events.InstantAsEpochSeconds", PrimitiveKind.DOUBLE)
 
     override fun serialize(
         encoder: Encoder,
         value: Instant,
     ) {
-        encoder.encodeLong(value.epochSeconds)
+        encoder.encodeDouble(value.epochSeconds.toDouble())
     }
 
-    override fun deserialize(decoder: Decoder) = Instant.fromEpochSeconds(decoder.decodeLong())
+    override fun deserialize(decoder: Decoder) = Instant.fromEpochSeconds(decoder.decodeDouble().toLong())
 }
