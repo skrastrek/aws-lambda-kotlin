@@ -28,7 +28,9 @@ data class DynamoDbStreamRecord(
     @SerialName("dynamodb")
     val dynamoDb: StreamRecord,
     val userIdentity: Identity? = null,
-)
+) : BatchEventEntry {
+    override val itemIdentifier = dynamoDb.sequenceNumber
+}
 
 @Serializable
 data class StreamRecord(
