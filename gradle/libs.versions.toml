@@ -2,7 +2,7 @@
 # Plugins
 kotlin = "2.1.21"
 
-ktlint = "12.2.0"
+ktlint = "12.3.0"
 
 maven-publish = "0.32.0"
 
