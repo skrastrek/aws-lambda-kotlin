@@ -25,7 +25,7 @@ subprojects {
     apply(plugin = "com.vanniktech.maven.publish")
 
     configure<MavenPublishBaseExtension> {
-        publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL)
+        publishToMavenCentral()
         signAllPublications()
 
         coordinates("io.skrastrek", "aws-lambda-kotlin-${project.name}", project.version.toString())
