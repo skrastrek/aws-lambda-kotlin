@@ -4,7 +4,7 @@ kotlin = "2.2.0"
 
 ktlint = "13.0.0"
 
-maven-publish = "0.33.0"
+maven-publish = "0.34.0"
 
 # Libs
 aws-lambda-java-core = "1.3.0"
