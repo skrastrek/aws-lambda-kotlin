@@ -46,7 +46,7 @@ jobs:
 
       - name: Gradle publish
         id: gradle-publish
-        run: ./gradlew -Pversion=${{ inputs.version }} publishAndReleaseToMavenCentral --stacktrace --no-configuration-cache # Configuration cache disabled as a work-around for https://github.com/gradle/gradle/issues/24329
+        run: ./gradlew -Pversion=${{ inputs.version }} publishAndReleaseToMavenCentral --stacktrace
         env:
           ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.maven-central-username }}
           ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.maven-central-password }}
