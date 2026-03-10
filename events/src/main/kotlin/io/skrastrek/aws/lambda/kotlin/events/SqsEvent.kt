@@ -27,8 +27,7 @@ data class SqsRecord(
     @SerialName("eventSourceARN")
     val eventSourceArn: String,
     val awsRegion: String,
-
-    ) : BatchEventEntry {
+) : BatchEventEntry {
     override val itemIdentifier = messageId
 }
 
