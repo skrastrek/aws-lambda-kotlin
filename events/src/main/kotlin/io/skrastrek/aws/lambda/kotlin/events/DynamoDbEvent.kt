@@ -37,11 +37,11 @@ data class StreamRecord(
     @SerialName("ApproximateCreationDateTime")
     val approximateCreationDateTime: InstantAsEpochSeconds,
     @SerialName("Keys")
-    val keys: Map<String, AttributeValue>,
+    val keys: DynamoDbAttributes,
     @SerialName("NewImage")
-    val newImage: Map<String, AttributeValue>? = null,
+    val newImage: DynamoDbAttributes? = null,
     @SerialName("OldImage")
-    val oldImage: Map<String, AttributeValue>? = null,
+    val oldImage: DynamoDbAttributes? = null,
     @SerialName("SequenceNumber")
     val sequenceNumber: String,
     @SerialName("SizeBytes")
@@ -82,7 +82,7 @@ data class AttributeValue(
     @SerialName("BS")
     val bs: List<ByteArray>? = null,
     @SerialName("M")
-    val m: Map<String, AttributeValue>? = null,
+    val m: DynamoDbAttributes? = null,
     @SerialName("L")
     val l: List<AttributeValue>? = null,
     @SerialName("NULL")
