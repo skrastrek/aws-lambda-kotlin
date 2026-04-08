@@ -21,7 +21,7 @@ data class SqsRecord(
     val receiptHandle: String,
     val body: String,
     val md5OfBody: String,
-    val attributes: Attributes,
+    val attributes: SqsAttributes,
     val messageAttributes: MessageAttributes = emptyMap(),
     val eventSource: String,
     @SerialName("eventSourceARN")
@@ -32,7 +32,7 @@ data class SqsRecord(
 }
 
 @Serializable
-data class Attributes(
+data class SqsAttributes(
     @SerialName("ApproximateReceiveCount")
     val approximateReceiveCount: Int,
     @SerialName("SentTimestamp")
