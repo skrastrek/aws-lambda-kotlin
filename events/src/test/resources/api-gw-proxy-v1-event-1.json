@@ -1,0 +1,140 @@
+{
+  "resource":"/{proxy+}",
+  "path":"/assistant/v1/chat",
+  "httpMethod":"POST",
+  "headers":{
+    "accept":"*/*",
+    "accept-encoding":"gzip, deflate, br, zstd",
+    "accept-language":"nb-NO,nb;q=0.9,no;q=0.8,nn;q=0.7,en-US;q=0.6,en;q=0.5",
+    "cache-control":"no-cache",
+    "content-type":"application/json",
+    "Host":"api.test.com",
+    "origin":"http://localhost:5173",
+    "pragma":"no-cache",
+    "Priority":"u=1, i",
+    "referer":"http://localhost:5173/",
+    "Sec-Ch-Ua":"\"Google Chrome\";v=\"147\", \"Not.A/Brand\";v=\"8\", \"Chromium\";v=\"147\"",
+    "Sec-Ch-Ua-Mobile":"?0",
+    "Sec-Ch-Ua-Platform":"\"macOS\"",
+    "Sec-Fetch-Dest":"empty",
+    "Sec-Fetch-Mode":"cors",
+    "Sec-Fetch-Site":"cross-site",
+    "User-Agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36",
+    "via":"3.0 ed0b1ae4224d4a858ec43080e17ab00c.cloudfront.net (CloudFront)",
+    "X-Amz-Cf-Id":"oLSiP-cF4lMsaNeMagr4-fKu7MqUbN36z33tgXKxMruCE2qxQKGrOA==",
+    "X-Amzn-Trace-Id":"Root=1-69fb3882-6c93cdd86593517e26b70f0f",
+    "X-Forwarded-For":"158.248.15.92, 15.158.194.106",
+    "X-Forwarded-Port":"443",
+    "X-Forwarded-Proto":"https"
+  },
+  "multiValueHeaders":{
+    "accept":[
+      "*/*"
+    ],
+    "accept-encoding":[
+      "gzip, deflate, br, zstd"
+    ],
+    "accept-language":[
+      "nb-NO,nb;q=0.9,no;q=0.8,nn;q=0.7,en-US;q=0.6,en;q=0.5"
+    ],
+    "cache-control":[
+      "no-cache"
+    ],
+    "content-type":[
+      "application/json"
+    ],
+    "Host":[
+      "api.test.com"
+    ],
+    "origin":[
+      "http://localhost:5173"
+    ],
+    "pragma":[
+      "no-cache"
+    ],
+    "Priority":[
+      "u=1, i"
+    ],
+    "referer":[
+      "http://localhost:5173/"
+    ],
+    "Sec-Ch-Ua":[
+      "\"Google Chrome\";v=\"147\", \"Not.A/Brand\";v=\"8\", \"Chromium\";v=\"147\""
+    ],
+    "Sec-Ch-Ua-Mobile":[
+      "?0"
+    ],
+    "Sec-Ch-Ua-Platform":[
+      "\"macOS\""
+    ],
+    "Sec-Fetch-Dest":[
+      "empty"
+    ],
+    "Sec-Fetch-Mode":[
+      "cors"
+    ],
+    "Sec-Fetch-Site":[
+      "cross-site"
+    ],
+    "User-Agent":[
+      "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36"
+    ],
+    "via":[
+      "3.0 ed0b1ae4224d4a858ec43080e17ab00c.cloudfront.net (CloudFront)"
+    ],
+    "X-Amz-Cf-Id":[
+      "oLSiP-cF4lMsaNeMagr4-fKu7MqUbN36z33tgXKxMruCE2qxQKGrOA=="
+    ],
+    "X-Amzn-Trace-Id":[
+      "Root=1-69fb3882-6c93cdd86593517e26b70f0f"
+    ],
+    "X-Forwarded-For":[
+      "158.248.15.92, 15.158.194.106"
+    ],
+    "X-Forwarded-Port":[
+      "443"
+    ],
+    "X-Forwarded-Proto":[
+      "https"
+    ]
+  },
+  "queryStringParameters":null,
+  "multiValueQueryStringParameters":null,
+  "pathParameters":{
+    "proxy":"chat"
+  },
+  "stageVariables":null,
+  "requestContext":{
+    "resourceId":"g3hayo",
+    "resourcePath":"/{proxy+}",
+    "httpMethod":"POST",
+    "extendedRequestId":"c8XEYHwqgi0FRJg=",
+    "requestTime":"06/May/2026:12:48:02 +0000",
+    "path":"/assistant/v1/chat",
+    "accountId":"336773442139",
+    "protocol":"HTTP/1.1",
+    "stage":"default",
+    "domainPrefix":"api",
+    "requestTimeEpoch":1778071682053,
+    "requestId":"1ae52432-6d8a-4ce5-a6c3-05a185214214",
+    "identity":{
+      "cognitoIdentityPoolId":null,
+      "accountId":null,
+      "cognitoIdentityId":null,
+      "caller":null,
+      "sourceIp":"15.158.194.106",
+      "principalOrgId":null,
+      "accessKey":null,
+      "cognitoAuthenticationType":null,
+      "cognitoAuthenticationProvider":null,
+      "userArn":null,
+      "userAgent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36",
+      "user":null
+    },
+    "domainName":"api.dev.fest.ly",
+    "deploymentId":"sj2uw3",
+    "apiId":"ffpxddkeij"
+  },
+  "body":null,
+  "isBase64Encoded":false
+}
