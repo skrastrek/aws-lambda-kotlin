@@ -17,6 +17,7 @@ val json =
         encodeDefaults = true
         explicitNulls = false
         ignoreUnknownKeys = true
+        coerceInputValues = true
     }
 
 interface RequestHandler<I : Any, O : Any> : RequestStreamHandler {
