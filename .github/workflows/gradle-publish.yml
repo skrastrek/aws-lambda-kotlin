@@ -46,7 +46,9 @@ jobs:
 
       - name: Gradle publish
         id: gradle-publish
-        run: ./gradlew -Pversion=${{ inputs.version }} publishAndReleaseToMavenCentral --stacktrace
+        run: |
+          VERSION="${{ inputs.version }}"
+          ./gradlew -Pversion="${VERSION#v}" publishAndReleaseToMavenCentral --stacktrace
         env:
           ORG_GRADLE_PROJECT_mavenCentralUsername: ${{ secrets.maven-central-username }}
           ORG_GRADLE_PROJECT_mavenCentralPassword: ${{ secrets.maven-central-password }}
