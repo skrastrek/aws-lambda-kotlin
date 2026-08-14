@@ -11,12 +11,12 @@ import kotlin.test.assertEquals
 class RequestHandlerTest {
     @Test
     fun handle_request() {
-        val input = ByteArrayInputStream(json.encodeToString("hello world").toByteArray())
+        val input = ByteArrayInputStream(defaultJson.encodeToString("hello world").toByteArray())
         val output = ByteArrayOutputStream()
 
         CapitalizeRequestHandler.handle(input, output)
 
-        assertEquals(json.encodeToString("HELLO WORLD"), output.toString(Charsets.UTF_8))
+        assertEquals(defaultJson.encodeToString("HELLO WORLD"), output.toString(Charsets.UTF_8))
     }
 }
 

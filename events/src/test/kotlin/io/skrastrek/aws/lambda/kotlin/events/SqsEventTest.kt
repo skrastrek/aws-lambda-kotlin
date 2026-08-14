@@ -1,6 +1,6 @@
 package io.skrastrek.aws.lambda.kotlin.events
 
-import io.skrastrek.aws.lambda.kotlin.core.json
+import io.skrastrek.aws.lambda.kotlin.core.defaultJson
 import kotlinx.serialization.ExperimentalSerializationApi
 import org.junit.jupiter.api.Test
 
@@ -8,11 +8,11 @@ import org.junit.jupiter.api.Test
 class SqsEventTest {
     @Test
     fun decode_1() {
-        json.decodeFromResource<SqsEvent>("sqs-event-1.json")
+        defaultJson.decodeFromResource<SqsEvent>("sqs-event-1.json")
     }
 
     @Test
     fun decode_2() {
-        json.decodeFromResource<SqsEvent>("sqs-event-2.json")
+        defaultJson.decodeFromResource<SqsEvent>("sqs-event-2.json")
     }
 }

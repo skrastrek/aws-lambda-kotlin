@@ -3,7 +3,6 @@ package io.skrastrek.aws.lambda.kotlin.coroutines
 import com.amazonaws.services.lambda.runtime.Context
 import io.skrastrek.aws.lambda.kotlin.core.EmptyContext
 import io.skrastrek.aws.lambda.kotlin.core.HandlerSerializers
-import io.skrastrek.aws.lambda.kotlin.core.json
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.ExperimentalSerializationApi

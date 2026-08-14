@@ -1,6 +1,6 @@
 package io.skrastrek.aws.lambda.kotlin.events
 
-import io.skrastrek.aws.lambda.kotlin.core.json
+import io.skrastrek.aws.lambda.kotlin.core.defaultJson
 import kotlinx.serialization.ExperimentalSerializationApi
 import org.junit.jupiter.api.Test
 
@@ -8,6 +8,6 @@ import org.junit.jupiter.api.Test
 class ApiGatewayProxyV1EventTest {
     @Test
     fun decode_1() {
-        json.decodeFromResource<ApiGatewayProxyV1Event>("api-gw-proxy-v1-event-1.json")
+        defaultJson.decodeFromResource<ApiGatewayProxyV1Event>("api-gw-proxy-v1-event-1.json")
     }
 }
