@@ -2,12 +2,10 @@ package io.skrastrek.aws.lambda.kotlin.coroutines
 
 import com.amazonaws.services.lambda.runtime.Context
 import io.skrastrek.aws.lambda.kotlin.core.EmptyContext
-import io.skrastrek.aws.lambda.kotlin.core.json
+import io.skrastrek.aws.lambda.kotlin.core.HandlerSerializers
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.withContext
-import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.SerializationStrategy
 import kotlinx.serialization.json.decodeFromStream
 import kotlinx.serialization.json.encodeToStream
 import java.io.InputStream
@@ -22,10 +20,9 @@ import java.io.OutputStream
  * Decoding and encoding are confined to [IO] so the handler stays correct whichever dispatcher the
  * caller uses, while [handle] itself runs on the caller's context.
  */
-interface SuspendingRequestHandler<I : Any, O : Any> : SuspendingRequestStreamHandler {
-    val deserializer: DeserializationStrategy<I>
-    val serializer: SerializationStrategy<O>
-
+interface SuspendingRequestHandler<I : Any, O : Any> :
+    SuspendingRequestStreamHandler,
+    HandlerSerializers<I, O> {
     suspend fun handle(
         input: I,
         context: Context,

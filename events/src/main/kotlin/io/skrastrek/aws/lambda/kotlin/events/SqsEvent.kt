@@ -1,13 +1,18 @@
 package io.skrastrek.aws.lambda.kotlin.events
 
+import io.skrastrek.aws.lambda.kotlin.core.HandlerSerializers
 import io.skrastrek.aws.lambda.kotlin.core.RequestHandler
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-interface SqsEventRequestHandler : RequestHandler<SqsEvent, BatchEventResponse> {
+interface SqsEventSerializers : HandlerSerializers<SqsEvent, BatchEventResponse> {
     override val deserializer get() = SqsEvent.serializer()
     override val serializer get() = BatchEventResponse.serializer()
 }
+
+interface SqsEventRequestHandler :
+    RequestHandler<SqsEvent, BatchEventResponse>,
+    SqsEventSerializers
 
 @Serializable
 data class SqsEvent(

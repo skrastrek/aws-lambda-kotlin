@@ -3,11 +3,13 @@ package io.skrastrek.aws.lambda.kotlin.coroutines
 import com.amazonaws.services.lambda.runtime.Context
 import com.amazonaws.services.lambda.runtime.RequestStreamHandler
 import io.skrastrek.aws.lambda.kotlin.core.EmptyContext
-import io.skrastrek.aws.lambda.kotlin.core.json
+import io.skrastrek.aws.lambda.kotlin.core.defaultJson
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.test.runTest
+import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.builtins.serializer
 import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import kotlin.test.Test
@@ -19,23 +21,23 @@ class SuspendingRequestHandlerTest {
     @Test
     fun `suspending handle decodes, invokes and encodes`() =
         runTest {
-            val input = ByteArrayInputStream(json.encodeToString("hello world").toByteArray())
+            val input = ByteArrayInputStream(defaultJson.encodeToString("hello world").toByteArray())
             val output = ByteArrayOutputStream()
 
             CapitalizeRequestHandler.handle(input, output)
 
-            assertEquals(json.encodeToString("HELLO WORLD"), output.toString(Charsets.UTF_8))
+            assertEquals(defaultJson.encodeToString("HELLO WORLD"), output.toString(Charsets.UTF_8))
         }
 
     @Test
     fun `blocking bridge runs the suspending handler`() {
-        val input = ByteArrayInputStream(json.encodeToString("hello world").toByteArray())
+        val input = ByteArrayInputStream(defaultJson.encodeToString("hello world").toByteArray())
         val output = ByteArrayOutputStream()
 
         // The AWS-facing entry point: this is what the managed Java runtime invokes.
         CapitalizeRequestHandler.handleRequest(input, output, EmptyContext)
 
-        assertEquals(json.encodeToString("HELLO WORLD"), output.toString(Charsets.UTF_8))
+        assertEquals(defaultJson.encodeToString("HELLO WORLD"), output.toString(Charsets.UTF_8))
     }
 
     @Test
@@ -56,6 +58,29 @@ class SuspendingRequestHandlerTest {
 
             assertEquals("payload", output.toString(Charsets.UTF_8))
         }
+
+    @Test
+    fun `an overridden json is honoured on the suspending path`() =
+        runTest {
+            val input = ByteArrayInputStream("""["a","b"]""".toByteArray())
+            val output = ByteArrayOutputStream()
+
+            PrettyPrintingHandler.handle(input, output)
+
+            assertEquals("[\n    \"A\",\n    \"B\"\n]", output.toString(Charsets.UTF_8))
+        }
+}
+
+private object PrettyPrintingHandler : SuspendingRequestHandler<List<String>, List<String>> {
+    override val deserializer get() = ListSerializer(String.serializer())
+    override val serializer get() = ListSerializer(String.serializer())
+
+    override val json = Json(defaultJson) { prettyPrint = true }
+
+    override suspend fun handle(
+        input: List<String>,
+        context: Context,
+    ) = input.map { it.uppercase() }
 }
 
 private object CapitalizeRequestHandler : SuspendingRequestHandler<String, String> {
