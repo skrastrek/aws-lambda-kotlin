@@ -5,6 +5,8 @@ import com.amazonaws.services.lambda.runtime.CognitoIdentity
 import com.amazonaws.services.lambda.runtime.Context
 import com.amazonaws.services.lambda.runtime.LambdaLogger
 import com.amazonaws.services.lambda.runtime.RequestStreamHandler
+import io.skrastrek.aws.lambda.kotlin.coroutines.SuspendingRequestStreamHandler
+import io.skrastrek.aws.lambda.kotlin.coroutines.asSuspending
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
@@ -29,6 +31,12 @@ abstract class LambdaNativeRuntime(
     protected val runtimeApiBaseUrl: String,
 ) {
     protected val http: HttpClient = HttpClient.newHttpClient()
+
+    /**
+     * The handler as a suspending one. Already-suspending handlers are used as-is, so an invocation
+     * that awaits IO releases its thread instead of parking it inside [kotlinx.coroutines.runBlocking].
+     */
+    protected val suspendingHandler: SuspendingRequestStreamHandler = handler.asSuspending()
 
     fun start() =
         runBlocking {
@@ -83,9 +91,9 @@ abstract class LambdaNativeRuntime(
             eventStream: InputStream,
             context: Context,
         ) {
+            val output = ByteArrayOutputStream()
+            suspendingHandler.handle(eventStream, output, context)
             withContext(IO) {
-                val output = ByteArrayOutputStream()
-                handler.handleRequest(eventStream, output, context)
                 http.send(
                     HttpRequest.newBuilder()
                         .uri(URI.create("${this@BufferedResponse.runtimeApiBaseUrl}/invocation/$requestId/response"))
@@ -110,8 +118,10 @@ abstract class LambdaNativeRuntime(
             coroutineScope {
                 val pipedOutput = PipedOutputStream()
                 val pipedInput = PipedInputStream(pipedOutput, 65536)
+                // Stays on IO: PipedOutputStream.write blocks once the buffer fills, regardless of
+                // whether the handler itself suspends.
                 launch(IO) {
-                    pipedOutput.use { handler.handleRequest(eventStream, it, context) }
+                    pipedOutput.use { suspendingHandler.handle(eventStream, it, context) }
                 }
                 withContext(IO) {
                     http.send(

@@ -1,6 +1,6 @@
 dependencies {
-    api(project(":coroutines"))
-    implementation(libs.kotlinx.coroutines.core)
+    api(project(":core"))
+    api(libs.kotlinx.coroutines.core)
     implementation(libs.kotlinx.serialization.json)
     testImplementation(kotlin("test"))
     testImplementation(libs.kotlinx.coroutines.test)
