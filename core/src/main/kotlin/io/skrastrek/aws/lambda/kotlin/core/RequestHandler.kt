@@ -24,16 +24,17 @@ interface RequestHandler<I : Any, O : Any> : RequestStreamHandler {
     val deserializer: DeserializationStrategy<I>
     val serializer: SerializationStrategy<O>
 
-    fun handleRequest(
+    fun handle(
         input: I,
         context: Context,
     ): O
 
+    /** AWS's entry point. Named by the platform contract, not by us — implement [handle] instead. */
     override fun handleRequest(
         input: InputStream,
         output: OutputStream,
         context: Context,
-    ) = handleRequest(input.jsonDecode(), context).jsonEncodeTo(output)
+    ) = handle(input.jsonDecode(), context).jsonEncodeTo(output)
 
     @OptIn(ExperimentalSerializationApi::class)
     private fun InputStream.jsonDecode(): I = json.decodeFromStream(deserializer, this)
@@ -42,9 +43,9 @@ interface RequestHandler<I : Any, O : Any> : RequestStreamHandler {
     private fun O.jsonEncodeTo(output: OutputStream) = json.encodeToStream(serializer, this, output)
 }
 
-fun <I : Any, O : Any> RequestHandler<I, O>.handleRequest(input: I): O = handleRequest(input, EmptyContext)
+fun <I : Any, O : Any> RequestHandler<I, O>.handle(input: I): O = handle(input, EmptyContext)
 
-fun <I : Any, O : Any> RequestHandler<I, O>.handleRequest(
+fun <I : Any, O : Any> RequestHandler<I, O>.handle(
     input: InputStream,
     output: OutputStream,
 ) = handleRequest(input, output, EmptyContext)

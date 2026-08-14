@@ -17,16 +17,16 @@ import java.io.OutputStream
  * Suspending counterpart to [io.skrastrek.aws.lambda.kotlin.core.RequestHandler].
  *
  * This is a sibling of the blocking hierarchy rather than a subtype of it: inheriting the blocking
- * `handleRequest(I, Context)` would conflict with the suspending one declared here.
+ * `handle(I, Context)` would conflict with the suspending one declared here.
  *
  * Decoding and encoding are confined to [IO] so the handler stays correct whichever dispatcher the
- * caller uses, while [handleRequest] itself runs on the caller's context.
+ * caller uses, while [handle] itself runs on the caller's context.
  */
 interface SuspendingRequestHandler<I : Any, O : Any> : SuspendingRequestStreamHandler {
     val deserializer: DeserializationStrategy<I>
     val serializer: SerializationStrategy<O>
 
-    suspend fun handleRequest(
+    suspend fun handle(
         input: I,
         context: Context,
     ): O
@@ -37,7 +37,7 @@ interface SuspendingRequestHandler<I : Any, O : Any> : SuspendingRequestStreamHa
         context: Context,
     ) {
         val decoded = withContext(IO) { input.jsonDecode() }
-        val result = handleRequest(decoded, context)
+        val result = handle(decoded, context)
         withContext(IO) { result.jsonEncodeTo(output) }
     }
 
@@ -48,7 +48,7 @@ interface SuspendingRequestHandler<I : Any, O : Any> : SuspendingRequestStreamHa
     private fun O.jsonEncodeTo(output: OutputStream) = json.encodeToStream(serializer, this, output)
 }
 
-suspend fun <I : Any, O : Any> SuspendingRequestHandler<I, O>.handleRequest(input: I): O = handleRequest(input, EmptyContext)
+suspend fun <I : Any, O : Any> SuspendingRequestHandler<I, O>.handle(input: I): O = handle(input, EmptyContext)
 
 suspend fun <I : Any, O : Any> SuspendingRequestHandler<I, O>.handle(
     input: InputStream,

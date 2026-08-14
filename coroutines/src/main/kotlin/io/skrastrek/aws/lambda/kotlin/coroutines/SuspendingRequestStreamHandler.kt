@@ -11,9 +11,10 @@ import java.io.OutputStream
 /**
  * Suspending counterpart to [RequestStreamHandler].
  *
- * The suspending entry point is named [handle] rather than `handleRequest` because Kotlin does not
- * treat the `suspend` modifier as part of a function signature, so a suspending overload with the
- * same parameters as the inherited blocking one would be a conflicting overload.
+ * `handle` is the name to implement across this library; `handleRequest` belongs to AWS. Here the
+ * distinction is also forced: a `suspend fun handleRequest` with these parameters is read as an
+ * attempt to override the inherited blocking one, which the compiler rejects with "suspend function
+ * cannot override non-suspend function".
  *
  * Extending [RequestStreamHandler] keeps implementations deployable on the AWS managed Java
  * runtime, whose bootstrap resolves handlers by that exact type. On that path [handleRequest]

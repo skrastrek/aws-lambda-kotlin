@@ -62,7 +62,7 @@ private object CapitalizeRequestHandler : SuspendingRequestHandler<String, Strin
     override val deserializer get() = String.serializer()
     override val serializer get() = String.serializer()
 
-    override suspend fun handleRequest(
+    override suspend fun handle(
         input: String,
         context: Context,
     ): String {
