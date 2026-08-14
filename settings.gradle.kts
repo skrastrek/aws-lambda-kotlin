@@ -4,5 +4,6 @@ include(
     "core",
     "coroutines",
     "events",
+    "events-coroutines",
     "runtime"
 )
