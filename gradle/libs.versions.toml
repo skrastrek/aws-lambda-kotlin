@@ -9,6 +9,8 @@ maven-publish = "0.37.0"
 # Libs
 aws-lambda-java-core = "1.4.0"
 
+graalvm-sdk = "25.0.4"
+
 kotlinx-coroutines = "1.11.0"
 kotlinx-serialization = "1.11.0"
 
@@ -22,6 +24,8 @@ maven-publish = { id = "com.vanniktech.maven.publish", version.ref = "maven-publ
 
 [libraries]
 aws-lambda-java-core = { group = "com.amazonaws", name = "aws-lambda-java-core", version.ref = "aws-lambda-java-core" }
+
+graalvm-nativeimage = { group = "org.graalvm.sdk", name = "nativeimage", version.ref = "graalvm-sdk" }
 
 kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
 kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "kotlinx-coroutines" }

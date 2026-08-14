@@ -23,18 +23,27 @@ val json =
 
 interface RequestHandler<I : Any, O : Any> : RequestStreamHandler {
     /**
+     * The [Json] used on the wire. Override to change its configuration, or to register contextual
+     * serializers — which is also how to keep serializer lookup reflection-free, see
+     * [SerializerInference].
+     */
+    val json: Json get() = io.skrastrek.aws.lambda.kotlin.core.json
+
+    /**
      * Reads [I] off the wire. Defaults to the serializer for whatever [I] is bound to by the
      * implementing class, so `RequestHandler<Foo, Bar>` needs no declaration here. Override to use a
      * different strategy, or when the binding is not concrete — see [SerializerInference].
      */
     @Suppress("UNCHECKED_CAST")
     val deserializer: DeserializationStrategy<I>
-        get() = SerializerInference.serializersOf(this, RequestHandler::class.java)[0] as DeserializationStrategy<I>
+        get() = inferredSerializers()[0] as DeserializationStrategy<I>
 
     /** Writes [O] to the wire. Inferred like [deserializer]. */
     @Suppress("UNCHECKED_CAST")
     val serializer: SerializationStrategy<O>
-        get() = SerializerInference.serializersOf(this, RequestHandler::class.java)[1] as SerializationStrategy<O>
+        get() = inferredSerializers()[1] as SerializationStrategy<O>
+
+    private fun inferredSerializers() = SerializerInference.serializersOf(javaClass, RequestHandler::class.java, json.serializersModule)
 
     fun handle(
         input: I,

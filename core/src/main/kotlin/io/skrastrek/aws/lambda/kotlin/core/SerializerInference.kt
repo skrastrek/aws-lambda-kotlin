@@ -1,6 +1,7 @@
 package io.skrastrek.aws.lambda.kotlin.core
 
 import kotlinx.serialization.KSerializer
+import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.serializer
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
@@ -19,33 +20,48 @@ import java.util.concurrent.ConcurrentHashMap
  * Unit>` erases `T` and cannot be inferred — such a handler has to override the serializers, or be
  * built through one of the `RequestHandler { ... }` factories, whose reified type parameters resolve
  * at the call site instead.
+ *
+ * ### GraalVM
+ *
+ * Reading the generic signature works in a native image unaided, but finding a class's generated
+ * serializer is reflective and needs registration. `RequestHandlerFeature`, shipped in this artifact
+ * and picked up automatically by `native-image`, registers it for every handler it finds reachable.
+ * Where that is not enough — a handler the analysis cannot see, or type arguments this cannot infer
+ * — register the serializer as contextual instead and no reflection is involved at all:
+ *
+ * ```kotlin
+ * override val json = Json(io.skrastrek.aws.lambda.kotlin.core.json) {
+ *     serializersModule = SerializersModule { contextual(SqsEvent::class, SqsEvent.serializer()) }
+ * }
+ * ```
  */
 object SerializerInference {
     private val cache = ConcurrentHashMap<Key, List<KSerializer<Any>>>()
 
     /**
-     * Serializers for the type arguments [handler] passes to [handlerInterface], in declaration
-     * order. Reflection runs once per handler class; later calls are a map lookup.
+     * Serializers for the type arguments [implementation] passes to [handlerInterface], in
+     * declaration order. [serializersModule] is consulted for contextual serializers before falling
+     * back to reflection. Resolution runs once per handler class; later calls are a map lookup.
      */
     fun serializersOf(
-        handler: Any,
+        implementation: Class<*>,
         handlerInterface: Class<*>,
+        serializersModule: SerializersModule,
     ): List<KSerializer<Any>> =
-        cache.computeIfAbsent(Key(handler.javaClass, handlerInterface)) { (implementation, target) ->
-            typeArgumentsOf(implementation, target).map { argument ->
-                serializer(argument.concreteOrFail(implementation, target))
+        cache.computeIfAbsent(Key(implementation, handlerInterface, serializersModule)) { key ->
+            typeArgumentsOf(key.implementation, key.handlerInterface).map { argument ->
+                key.serializersModule.serializer(argument.concreteOrFail(key.implementation, key.handlerInterface))
             }
         }
 
-    private data class Key(
-        val implementation: Class<*>,
-        val handlerInterface: Class<*>,
-    )
-
-    /** The arguments [implementation] passes to [target], resolved through any intermediate types. */
-    private fun typeArgumentsOf(
+    /**
+     * The type arguments [implementation] passes to [handlerInterface], resolved through any
+     * intermediate types. Exposed for `RequestHandlerFeature`, which needs the types at image build
+     * time without instantiating the handler.
+     */
+    fun typeArgumentsOf(
         implementation: Class<*>,
-        target: Class<*>,
+        handlerInterface: Class<*>,
     ): List<Type> {
         fun search(
             type: Type,
@@ -68,7 +84,7 @@ object SerializerInference {
                     return null
                 }
             }
-            if (raw == target) return arguments
+            if (raw == handlerInterface) return arguments
 
             val inherited: Map<TypeVariable<*>, Type> =
                 raw.typeParameters
@@ -79,8 +95,14 @@ object SerializerInference {
         }
 
         return search(implementation, emptyMap())
-            ?: error("${implementation.name} does not implement ${target.name}.")
+            ?: error("${implementation.name} does not implement ${handlerInterface.name}.")
     }
+
+    private data class Key(
+        val implementation: Class<*>,
+        val handlerInterface: Class<*>,
+        val serializersModule: SerializersModule,
+    )
 
     /** Replaces type variables with what the subtype bound them to, as far as the bindings reach. */
     private fun Type.substitute(bindings: Map<TypeVariable<*>, Type>): Type =
@@ -92,14 +114,14 @@ object SerializerInference {
 
     private fun Type.concreteOrFail(
         implementation: Class<*>,
-        target: Class<*>,
+        handlerInterface: Class<*>,
     ): Type =
         also {
             if (it is TypeVariable<*>) {
                 error(
-                    "${implementation.name} leaves ${target.simpleName}'s type argument '${it.name}' generic, " +
-                        "so its serializer cannot be inferred. Override the serializers explicitly, or build the " +
-                        "handler through the ${target.simpleName} { ... } factory.",
+                    "${implementation.name} leaves ${handlerInterface.simpleName}'s type argument '${it.name}' " +
+                        "generic, so its serializer cannot be inferred. Override the serializers explicitly, or " +
+                        "build the handler through the ${handlerInterface.simpleName} { ... } factory.",
                 )
             }
         }

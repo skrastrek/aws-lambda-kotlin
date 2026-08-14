@@ -3,12 +3,12 @@ package io.skrastrek.aws.lambda.kotlin.coroutines
 import com.amazonaws.services.lambda.runtime.Context
 import io.skrastrek.aws.lambda.kotlin.core.EmptyContext
 import io.skrastrek.aws.lambda.kotlin.core.SerializerInference
-import io.skrastrek.aws.lambda.kotlin.core.json
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerializationStrategy
+import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromStream
 import kotlinx.serialization.json.encodeToStream
 import kotlinx.serialization.serializer
@@ -26,6 +26,13 @@ import java.io.OutputStream
  */
 interface SuspendingRequestHandler<I : Any, O : Any> : SuspendingRequestStreamHandler {
     /**
+     * The [Json] used on the wire. Override to change its configuration, or to register contextual
+     * serializers — which is also how to keep serializer lookup reflection-free, see
+     * [SerializerInference].
+     */
+    val json: Json get() = io.skrastrek.aws.lambda.kotlin.core.json
+
+    /**
      * Reads [I] off the wire. Defaults to the serializer for whatever [I] is bound to by the
      * implementing class, so `SuspendingRequestHandler<Foo, Bar>` needs no declaration here.
      * Override to use a different strategy, or when the binding is not concrete — see
@@ -33,16 +40,15 @@ interface SuspendingRequestHandler<I : Any, O : Any> : SuspendingRequestStreamHa
      */
     @Suppress("UNCHECKED_CAST")
     val deserializer: DeserializationStrategy<I>
-        get() =
-            SerializerInference
-                .serializersOf(this, SuspendingRequestHandler::class.java)[0] as DeserializationStrategy<I>
+        get() = inferredSerializers()[0] as DeserializationStrategy<I>
 
     /** Writes [O] to the wire. Inferred like [deserializer]. */
     @Suppress("UNCHECKED_CAST")
     val serializer: SerializationStrategy<O>
-        get() =
-            SerializerInference
-                .serializersOf(this, SuspendingRequestHandler::class.java)[1] as SerializationStrategy<O>
+        get() = inferredSerializers()[1] as SerializationStrategy<O>
+
+    private fun inferredSerializers() =
+        SerializerInference.serializersOf(javaClass, SuspendingRequestHandler::class.java, json.serializersModule)
 
     suspend fun handle(
         input: I,
