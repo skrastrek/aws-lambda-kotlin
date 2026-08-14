@@ -1,5 +1,6 @@
 package io.skrastrek.aws.lambda.kotlin.events
 
+import io.skrastrek.aws.lambda.kotlin.core.HandlerSerializers
 import io.skrastrek.aws.lambda.kotlin.core.RequestHandler
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonObject
@@ -9,10 +10,14 @@ import kotlinx.serialization.json.JsonObject
  * https://github.com/aws/aws-lambda-java-libs/blob/master/aws-lambda-java-events/src/main/java/com/amazonaws/services/lambda/runtime/events/APIGatewayV2HTTPEvent.java
  */
 
-interface ApiGatewayProxyV2RequestHandler : RequestHandler<ApiGatewayProxyV2Event, ApiGatewayProxyV2Result> {
+interface ApiGatewayProxyV2Serializers : HandlerSerializers<ApiGatewayProxyV2Event, ApiGatewayProxyV2Result> {
     override val deserializer get() = ApiGatewayProxyV2Event.serializer()
     override val serializer get() = ApiGatewayProxyV2Result.serializer()
 }
+
+interface ApiGatewayProxyV2RequestHandler :
+    RequestHandler<ApiGatewayProxyV2Event, ApiGatewayProxyV2Result>,
+    ApiGatewayProxyV2Serializers
 
 @Serializable
 data class ApiGatewayProxyV2Event(

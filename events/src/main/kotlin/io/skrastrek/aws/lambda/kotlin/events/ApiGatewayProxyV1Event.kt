@@ -1,13 +1,18 @@
 package io.skrastrek.aws.lambda.kotlin.events
 
+import io.skrastrek.aws.lambda.kotlin.core.HandlerSerializers
 import io.skrastrek.aws.lambda.kotlin.core.RequestHandler
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonObject
 
-interface ApiGatewayProxyV1RequestHandler : RequestHandler<ApiGatewayProxyV1Event, ApiGatewayProxyV1Result> {
+interface ApiGatewayProxyV1Serializers : HandlerSerializers<ApiGatewayProxyV1Event, ApiGatewayProxyV1Result> {
     override val deserializer get() = ApiGatewayProxyV1Event.serializer()
     override val serializer get() = ApiGatewayProxyV1Result.serializer()
 }
+
+interface ApiGatewayProxyV1RequestHandler :
+    RequestHandler<ApiGatewayProxyV1Event, ApiGatewayProxyV1Result>,
+    ApiGatewayProxyV1Serializers
 
 @Serializable
 data class ApiGatewayProxyV1Event(

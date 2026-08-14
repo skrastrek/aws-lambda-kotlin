@@ -2,9 +2,7 @@ package io.skrastrek.aws.lambda.kotlin.core
 
 import com.amazonaws.services.lambda.runtime.Context
 import com.amazonaws.services.lambda.runtime.RequestStreamHandler
-import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.SerializationStrategy
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromStream
 import kotlinx.serialization.json.encodeToStream
@@ -20,10 +18,9 @@ val json =
         coerceInputValues = true
     }
 
-interface RequestHandler<I : Any, O : Any> : RequestStreamHandler {
-    val deserializer: DeserializationStrategy<I>
-    val serializer: SerializationStrategy<O>
-
+interface RequestHandler<I : Any, O : Any> :
+    RequestStreamHandler,
+    HandlerSerializers<I, O> {
     fun handle(
         input: I,
         context: Context,

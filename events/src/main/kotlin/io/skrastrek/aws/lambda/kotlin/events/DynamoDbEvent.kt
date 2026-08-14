@@ -1,13 +1,18 @@
 package io.skrastrek.aws.lambda.kotlin.events
 
+import io.skrastrek.aws.lambda.kotlin.core.HandlerSerializers
 import io.skrastrek.aws.lambda.kotlin.core.RequestHandler
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-interface DynamoDbEventRequestHandler : RequestHandler<DynamoDbEvent, BatchEventResponse> {
+interface DynamoDbEventSerializers : HandlerSerializers<DynamoDbEvent, BatchEventResponse> {
     override val deserializer get() = DynamoDbEvent.serializer()
     override val serializer get() = BatchEventResponse.serializer()
 }
+
+interface DynamoDbEventRequestHandler :
+    RequestHandler<DynamoDbEvent, BatchEventResponse>,
+    DynamoDbEventSerializers
 
 @Serializable
 data class DynamoDbEvent(

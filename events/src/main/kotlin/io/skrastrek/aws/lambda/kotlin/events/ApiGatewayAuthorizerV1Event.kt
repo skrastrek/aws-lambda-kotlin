@@ -1,5 +1,6 @@
 package io.skrastrek.aws.lambda.kotlin.events
 
+import io.skrastrek.aws.lambda.kotlin.core.HandlerSerializers
 import io.skrastrek.aws.lambda.kotlin.core.RequestHandler
 import kotlinx.serialization.Serializable
 
@@ -8,10 +9,14 @@ import kotlinx.serialization.Serializable
  * https://github.com/aws/aws-lambda-java-libs/blob/main/aws-lambda-java-events/src/main/java/com/amazonaws/services/lambda/runtime/events/APIGatewayCustomAuthorizerEvent.java
  */
 
-interface ApiGatewayAuthorizerV1RequestHandler : RequestHandler<ApiGatewayAuthorizerV1Event, ApiGatewayAuthorizerV1Result> {
+interface ApiGatewayAuthorizerV1Serializers : HandlerSerializers<ApiGatewayAuthorizerV1Event, ApiGatewayAuthorizerV1Result> {
     override val deserializer get() = ApiGatewayAuthorizerV1Event.serializer()
     override val serializer get() = ApiGatewayAuthorizerV1Result.serializer()
 }
+
+interface ApiGatewayAuthorizerV1RequestHandler :
+    RequestHandler<ApiGatewayAuthorizerV1Event, ApiGatewayAuthorizerV1Result>,
+    ApiGatewayAuthorizerV1Serializers
 
 @Serializable
 data class ApiGatewayAuthorizerV1Event(
