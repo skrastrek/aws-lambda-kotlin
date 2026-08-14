@@ -14,7 +14,7 @@ class RequestHandlerTest {
         val input = ByteArrayInputStream(json.encodeToString("hello world").toByteArray())
         val output = ByteArrayOutputStream()
 
-        CapitalizeRequestHandler.handleRequest(input, output)
+        CapitalizeRequestHandler.handle(input, output)
 
         assertEquals(json.encodeToString("HELLO WORLD"), output.toString(Charsets.UTF_8))
     }
@@ -24,7 +24,7 @@ private object CapitalizeRequestHandler : RequestHandler<String, String> {
     override val deserializer get() = String.serializer()
     override val serializer get() = String.serializer()
 
-    override fun handleRequest(
+    override fun handle(
         input: String,
         context: Context,
     ): String = input.uppercase()

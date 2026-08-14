@@ -1,13 +1,18 @@
 package io.skrastrek.aws.lambda.kotlin.runtime
 
+import com.amazonaws.services.lambda.runtime.Context
 import com.sun.net.httpserver.HttpServer
+import io.skrastrek.aws.lambda.kotlin.coroutines.SuspendingRequestStreamHandler
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
+import java.io.InputStream
+import java.io.OutputStream
 import java.net.InetSocketAddress
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
@@ -178,6 +183,76 @@ class LambdaNativeRuntimeTest {
 
             val body = capturedErrorBody.await()
             assertTrue(""""errorMessage":"stream error"""" in body)
+            assertTrue(""""errorType":"java.lang.RuntimeException"""" in body)
+            assertEquals("Unhandled", capturedErrorType.await())
+        }
+
+    @Test
+    fun `BufferedResponse invokes a suspending handler and posts its output`() =
+        runTest {
+            val requestId = "req-suspending-01"
+            val eventBody = """{"action":"suspend"}"""
+            val capturedBody = CompletableDeferred<String>()
+
+            registerNextInvocation(requestId, eventBody)
+            server.createContext("/2018-06-01/runtime/invocation/$requestId/response") { exchange ->
+                capturedBody.complete(exchange.requestBody.readBytes().decodeToString())
+                exchange.sendResponseHeaders(202, -1)
+                exchange.close()
+            }
+
+            startRuntime(
+                LambdaNativeRuntime.BufferedResponse(
+                    object : SuspendingRequestStreamHandler {
+                        override suspend fun handle(
+                            input: InputStream,
+                            output: OutputStream,
+                            context: Context,
+                        ) {
+                            delay(10)
+                            output.write(input.readBytes())
+                        }
+                    },
+                    base(),
+                ),
+            )
+
+            assertEquals(eventBody, capturedBody.await())
+        }
+
+    @Test
+    fun `BufferedResponse posts to error endpoint when a suspending handler throws`() =
+        runTest {
+            val requestId = "req-suspending-02"
+            val capturedErrorBody = CompletableDeferred<String>()
+            val capturedErrorType = CompletableDeferred<String>()
+
+            registerNextInvocation(requestId, "{}")
+            server.createContext("/2018-06-01/runtime/invocation/$requestId/error") { exchange ->
+                capturedErrorBody.complete(exchange.requestBody.readBytes().decodeToString())
+                capturedErrorType.complete(exchange.requestHeaders.getFirst("Lambda-Runtime-Function-Error-Type"))
+                exchange.sendResponseHeaders(202, -1)
+                exchange.close()
+            }
+
+            startRuntime(
+                LambdaNativeRuntime.BufferedResponse(
+                    object : SuspendingRequestStreamHandler {
+                        override suspend fun handle(
+                            input: InputStream,
+                            output: OutputStream,
+                            context: Context,
+                        ) {
+                            delay(10)
+                            throw RuntimeException("suspending handler error")
+                        }
+                    },
+                    base(),
+                ),
+            )
+
+            val body = capturedErrorBody.await()
+            assertTrue(""""errorMessage":"suspending handler error"""" in body)
             assertTrue(""""errorType":"java.lang.RuntimeException"""" in body)
             assertEquals("Unhandled", capturedErrorType.await())
         }
