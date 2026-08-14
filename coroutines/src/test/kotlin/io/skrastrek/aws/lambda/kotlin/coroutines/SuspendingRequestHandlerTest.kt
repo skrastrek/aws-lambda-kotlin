@@ -39,6 +39,29 @@ class SuspendingRequestHandlerTest {
     }
 
     @Test
+    fun `serializers are inferred from the type arguments`() =
+        runTest {
+            val input = ByteArrayInputStream(json.encodeToString("hello world").toByteArray())
+            val output = ByteArrayOutputStream()
+
+            InferredCapitalizeRequestHandler.handle(input, output)
+
+            assertEquals(json.encodeToString("HELLO WORLD"), output.toString(Charsets.UTF_8))
+        }
+
+    @Test
+    fun `factory builds a handler from a lambda`() =
+        runTest {
+            val handler = SuspendingRequestHandler<String, Int> { input, _ -> input.length }
+            val input = ByteArrayInputStream(json.encodeToString("hello world").toByteArray())
+            val output = ByteArrayOutputStream()
+
+            handler.handle(input, output)
+
+            assertEquals(json.encodeToString(11), output.toString(Charsets.UTF_8))
+        }
+
+    @Test
     fun `asSuspending returns a suspending handler unchanged`() {
         assertSame(CapitalizeRequestHandler, CapitalizeRequestHandler.asSuspending())
     }
@@ -56,6 +79,16 @@ class SuspendingRequestHandlerTest {
 
             assertEquals("payload", output.toString(Charsets.UTF_8))
         }
+}
+
+private object InferredCapitalizeRequestHandler : SuspendingRequestHandler<String, String> {
+    override suspend fun handle(
+        input: String,
+        context: Context,
+    ): String {
+        delay(1)
+        return input.uppercase()
+    }
 }
 
 private object CapitalizeRequestHandler : SuspendingRequestHandler<String, String> {
