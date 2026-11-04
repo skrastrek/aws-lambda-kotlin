@@ -4,7 +4,6 @@ import org.gradle.api.tasks.testing.logging.TestLogEvent.PASSED
 import org.gradle.api.tasks.testing.logging.TestLogEvent.SKIPPED
 import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jlleitschuh.gradle.ktlint.KtlintExtension
 
 allprojects {
@@ -24,12 +23,6 @@ subprojects {
     apply(plugin = "org.jetbrains.kotlin.jvm")
     apply(plugin = "org.jlleitschuh.gradle.ktlint")
     apply(plugin = "com.vanniktech.maven.publish")
-
-    tasks.withType<KotlinCompile>().configureEach {
-        compilerOptions {
-            optIn = listOf("kotlin.time.ExperimentalTime")
-        }
-    }
 
     configure<MavenPublishBaseExtension> {
         publishToMavenCentral()
