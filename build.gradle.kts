@@ -28,7 +28,6 @@ subprojects {
 
     tasks.withType<KotlinCompile>().configureEach {
         compilerOptions {
-            optIn = listOf("kotlin.time.ExperimentalTime")
             jvmTarget = JvmTarget.JVM_21
             freeCompilerArgs.add("-Xjdk-release=21")
         }
