@@ -3,6 +3,7 @@ import org.gradle.api.tasks.testing.logging.TestLogEvent.FAILED
 import org.gradle.api.tasks.testing.logging.TestLogEvent.PASSED
 import org.gradle.api.tasks.testing.logging.TestLogEvent.SKIPPED
 import org.gradle.kotlin.dsl.withType
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jlleitschuh.gradle.ktlint.KtlintExtension
@@ -28,7 +29,14 @@ subprojects {
     tasks.withType<KotlinCompile>().configureEach {
         compilerOptions {
             optIn = listOf("kotlin.time.ExperimentalTime")
+            jvmTarget = JvmTarget.JVM_21
+            freeCompilerArgs.add("-Xjdk-release=21")
         }
+    }
+
+    // Also sets org.gradle.jvm.version=21 in published Gradle module metadata
+    tasks.withType<JavaCompile>().configureEach {
+        options.release = 21
     }
 
     configure<MavenPublishBaseExtension> {
