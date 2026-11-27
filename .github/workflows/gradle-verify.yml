@@ -34,6 +34,7 @@ jobs:
         id: gradle-ktlint-check
         run: ./gradlew ktlintCheck
 
+      # Runs the JVM and linuxX64 tests. macosArm64 tests need a macOS host and are skipped here.
       - name: Gradle test
         id: gradle-test
-        run: ./gradlew test
+        run: ./gradlew allTests
