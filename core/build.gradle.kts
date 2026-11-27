@@ -1,9 +1,16 @@
 plugins {
-    alias(libs.plugins.kotlin.serialization)
+    id("kmp-library-js")
 }
 
-dependencies {
-    api(libs.aws.lambda.java.core)
-    implementation(libs.kotlinx.serialization.json)
-    testImplementation(kotlin("test"))
+kotlin {
+    sourceSets {
+        commonMain.dependencies {
+            api(libs.kotlinx.io.core)
+            implementation(libs.kotlinx.serialization.json)
+            implementation(libs.kotlinx.serialization.json.io)
+        }
+        jvmMain.dependencies {
+            api(libs.aws.lambda.java.core)
+        }
+    }
 }

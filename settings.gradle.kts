@@ -1,3 +1,13 @@
+pluginManagement {
+    includeBuild("build-logic")
+}
+
+dependencyResolutionManagement {
+    repositories {
+        mavenCentral()
+    }
+}
+
 rootProject.name = "aws-lambda-kotlin"
 
 include(
@@ -5,5 +15,5 @@ include(
     "coroutines",
     "events",
     "events-coroutines",
-    "runtime"
+    "runtime",
 )
