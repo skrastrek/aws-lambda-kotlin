@@ -2,8 +2,6 @@ package io.skrastrek.aws.lambda.kotlin.coroutines
 
 import io.skrastrek.aws.lambda.kotlin.core.Context
 import io.skrastrek.aws.lambda.kotlin.core.RequestStreamHandler
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
 import kotlinx.coroutines.withContext
 import kotlinx.io.Sink
 import kotlinx.io.Source
@@ -27,7 +25,7 @@ expect interface SuspendingRequestStreamHandler {
     )
 }
 
-/** Views a blocking handler as a [SuspendingRequestStreamHandler] whose work runs on IO. */
+/** Views a blocking handler as a [SuspendingRequestStreamHandler] whose work runs on the IO dispatcher. */
 fun RequestStreamHandler.asSuspending(): SuspendingRequestStreamHandler = BlockingRequestStreamHandler(this)
 
 private class BlockingRequestStreamHandler(
@@ -37,5 +35,5 @@ private class BlockingRequestStreamHandler(
         input: Source,
         output: Sink,
         context: Context,
-    ) = withContext(Dispatchers.IO) { delegate.handle(input, output, context) }
+    ) = withContext(ioDispatcher) { delegate.handle(input, output, context) }
 }

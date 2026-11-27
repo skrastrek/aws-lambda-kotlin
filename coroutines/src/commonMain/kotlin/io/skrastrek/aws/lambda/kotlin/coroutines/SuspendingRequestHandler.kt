@@ -5,8 +5,6 @@ package io.skrastrek.aws.lambda.kotlin.coroutines
 import io.skrastrek.aws.lambda.kotlin.core.Context
 import io.skrastrek.aws.lambda.kotlin.core.EmptyContext
 import io.skrastrek.aws.lambda.kotlin.core.HandlerSerializers
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
 import kotlinx.coroutines.withContext
 import kotlinx.io.Sink
 import kotlinx.io.Source
@@ -17,7 +15,7 @@ import kotlinx.serialization.json.io.encodeToSink
 /**
  * Suspending counterpart to [io.skrastrek.aws.lambda.kotlin.core.RequestHandler].
  *
- * Decoding and encoding are confined to IO so the handler stays correct whichever dispatcher the
+ * Decoding and encoding are confined to the IO dispatcher so the handler stays correct whichever dispatcher the
  * caller uses, while [handle] itself runs on the caller's context.
  */
 interface SuspendingRequestHandler<I : Any, O : Any> :
@@ -33,9 +31,9 @@ interface SuspendingRequestHandler<I : Any, O : Any> :
         output: Sink,
         context: Context,
     ) {
-        val decoded = withContext(Dispatchers.IO) { json.decodeFromSource(deserializer, input) }
+        val decoded = withContext(ioDispatcher) { json.decodeFromSource(deserializer, input) }
         val result = handle(decoded, context)
-        withContext(Dispatchers.IO) { json.encodeToSink(serializer, result, output) }
+        withContext(ioDispatcher) { json.encodeToSink(serializer, result, output) }
     }
 }
 

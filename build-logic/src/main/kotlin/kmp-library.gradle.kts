@@ -1,6 +1,7 @@
 import org.gradle.api.tasks.testing.logging.TestLogEvent.FAILED
 import org.gradle.api.tasks.testing.logging.TestLogEvent.PASSED
 import org.gradle.api.tasks.testing.logging.TestLogEvent.SKIPPED
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 
@@ -33,6 +34,18 @@ kotlin {
 
     compilerOptions {
         freeCompilerArgs.add("-Xexpect-actual-classes")
+    }
+
+    // concurrentMain: code shared by the multithreaded targets (JVM and native), where
+    // Dispatchers.IO and runBlocking exist. JS, added by kmp-library-js, sits outside it.
+    @OptIn(ExperimentalKotlinGradlePluginApi::class)
+    applyDefaultHierarchyTemplate {
+        common {
+            group("concurrent") {
+                withJvm()
+                group("native")
+            }
+        }
     }
 
     // platform.posix links libcrypt.so.1, which the provided.al2023 Lambda image lacks. Nothing
